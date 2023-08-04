@@ -1,0 +1,34 @@
+[package]
+name = "app"
+version = "1.0.0"
+authors = ["Yuki Tsujii <yuki.tsujii.37@gmail.com>"]
+edition = "2021"
+
+[dependencies]
+
+# basic
+dotenv = "*"
+env_logger = "*"
+once_cell = "*"
+anyhow = "*"
+
+# General
+bytes = "*"
+regex = "*"
+chrono = { version = "0.4", features = ["serde"] }
+
+# Json parser
+url = "*"
+serde = "*"
+serde_derive = "*"
+serde_json = "*"
+
+# Web Server
+actix-web = "4"
+
+# Database
+bigdecimal = "*"
+deadpool = "*"
+diesel = { version = "*", features = ["chrono"] }
+diesel-async = { version = "*", features = ["postgres", "deadpool"] }
+

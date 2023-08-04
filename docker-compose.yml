@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: sample-app
+    build:
+      context: ./app
+    tty: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app:/app
+      - ./data/app/target:/usr/src/app/target
+      - ./data/app/sccache:/root/.cache/sccache
+    environment:
+      RUSTC_WRAPPER: /usr/local/cargo/bin/sccache
+    command: sh -c 'dockerize -timeout 60s -wait tcp://db:5432 && cargo watch -s "cargo fmt && cargo clippy --fix --allow-no-vcs && cargo run"'
+
+  app-test:
+    container_name: sample-srv-test
+    build:
+      context: ./app
+    tty: true
+    volumes:
+      - ./app:/app
+      - ./data/app/target:/usr/src/app/target
+      - ./data/app/sccache:/root/.cache/sccache
+    environment:
+      RUSTC_WRAPPER: /usr/local/cargo/bin/sccache
+    command: sh -c 'dockerize -timeout 60s -wait tcp://db:5432 && cargo watch -s "cargo build && cargo test -- --nocapture"'
+
+  db: # database
+    container_name: sample-db
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: username
+      POSTGRES_DB: database
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - ./data/psql:/var/lib/postgresql/data
+      - ./db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+
